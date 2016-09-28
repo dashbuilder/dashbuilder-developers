@@ -15,12 +15,15 @@
  */
 package org.dashbuilder.dataprovider;
 
+import java.util.List;
+
 import org.dashbuilder.dataset.DataSet;
 import org.dashbuilder.dataset.DataSetFactory;
 import org.dashbuilder.dataset.DataSetLookup;
 import org.dashbuilder.dataset.DataSetMetadata;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistryListener;
+import org.dashbuilder.dataset.impl.DataSetMetadataImpl;
 
 /**
  * My data set provider implementation
@@ -35,15 +38,16 @@ public class MyDataSetProvider implements DataSetProvider, DataSetDefRegistryLis
 
     /**
      * This method is used to get the metadata related with a given the data set definition.
+     *
+     * <p>As a dummy implementation we are retrieving the entire dataset and getting its metadata. This is not the
+     * recommended approach tough, specially in cases where the dataset is big. The recommended approach is to
+     * ask the external storage with the minimum required calls in order to figure out all the required metadata.</p>
+     *
+     * <p>You can use the {@link DataSetMetadataImpl#DataSetMetadataImpl(DataSetDef, String, int, int, List, List, int)}
+     * constructor to initialize the metadata instance to return.</p>
      */
     public DataSetMetadata getDataSetMetadata(DataSetDef def) throws Exception {
-
         // Add your own logic...
-
-        // As a dummy implementation we are retrieving the entire dataset and getting its metadata. This is not the
-        // recommended approach tough, specially in cases where the dataset is big. The recommended approach is to
-        // ask the external storage with the minimum required calls in order to figure out all the required metadata.
-
         DataSet dataSet = lookupDataSet(def, null);
         return dataSet == null ? null : dataSet.getMetadata();
     }
@@ -77,15 +81,15 @@ public class MyDataSetProvider implements DataSetProvider, DataSetDefRegistryLis
     /**
      * This method is very useful in case the provider is storing temporal data for every data set definition.
      * For instance, some core providers like SQL o CSV has an internal cache that can be activated. When that happens,
-     * calls to this method are executed by the dashbuilder core the determine if the data set requires an update.
-     * The update frequency is determined by the {@link DataSetDef} settings {@link DataSetDef#isRefreshAlways()} and
-     * {@link DataSetDef#getRefreshTime()}.
+     * calls to this method are executed by the dashbuilder core to determine if the data set requires an update.
+     * The update frequency is determined by both the {@link DataSetDef#isRefreshAlways()} and
+     * {@link DataSetDef#getRefreshTime()} settings.
      *
      * @param def The data set definition to check
-     * @return true only when temporal data hold by this provider that has become stale.
+     * @return true - only if the temporal data hold by this provider has become stale.
      */
     public boolean isDataSetOutdated(DataSetDef def) {
-        // By default, a provider does not hold any temporal data, so return false by default.
+        // By default, a provider does not hold any temporal data, so return false
         return false;
     }
 
@@ -111,6 +115,8 @@ public class MyDataSetProvider implements DataSetProvider, DataSetDefRegistryLis
     }
 
     public void onDataSetDefRegistered(DataSetDef newDef) {
-        // Add your own logic in case you are interested in this type of events ...
+        if (this.getType().equals(newDef.getProvider())) {
+            // Add your own logic in case you are interested in this type of events ...
+        }
     }
 }

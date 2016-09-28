@@ -14,12 +14,15 @@
 */
 package org.dashbuilder.dataset;
 
+import java.util.Properties;
+
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
 import org.dashbuilder.dataprovider.MyDataSetProvider;
 import org.dashbuilder.dataset.def.DataSetDef;
 import org.dashbuilder.dataset.def.DataSetDefRegistry;
+import org.dashbuilder.dataset.json.DataSetDefJSONMarshaller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +38,7 @@ public class MyDataSetProviderTest {
     DataSetProviderRegistry providerRegistry = DataSetCore.get().getDataSetProviderRegistry();
     DataSetDefRegistry dataSetDefRegistry = DataSetCore.get().getDataSetDefRegistry();
     DataSetManager dataSetManager = DataSetCore.get().getDataSetManager();
+    DataSetDefJSONMarshaller jsonMarshaller = DataSetCore.get().getDataSetDefJSONMarshaller();
     DataSetDef customDef = new DataSetDef();
 
     @Before
@@ -51,8 +55,15 @@ public class MyDataSetProviderTest {
     @Test
     public void testRegistry() throws Exception {
         DataSetProviderType type = providerRegistry.getProviderTypeByName("MY");
-        assertEquals(customProvider.getProviderName(), "MY");
+        assertEquals(customProvider.getType().getName(), "MY");
         assertEquals(type, customProvider.getType());
+    }
+
+    @Test
+    public void testJson() throws Exception {
+        String json = jsonMarshaller.toJsonString(customDef);
+        assertTrue(json.contains("\"prop1\": \"hello\""));
+        assertTrue(json.contains("\"prop2\": \"world\""));
     }
 
     @Test
