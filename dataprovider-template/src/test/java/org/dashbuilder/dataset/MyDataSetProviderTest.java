@@ -14,8 +14,6 @@
 */
 package org.dashbuilder.dataset;
 
-import java.util.Properties;
-
 import org.dashbuilder.DataSetCore;
 import org.dashbuilder.dataprovider.DataSetProviderRegistry;
 import org.dashbuilder.dataprovider.DataSetProviderType;
